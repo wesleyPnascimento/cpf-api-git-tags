@@ -18,8 +18,8 @@ services:
       - "traefik.http.routers.${SERVICE_NAME}.tls.certresolver=letsencrypt"
 
     networks:
-      - opt-net
+      - api-cpf-net
 
 networks:
-  opt-net:
+  api-cpf-net:
     external: true
