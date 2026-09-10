@@ -5,7 +5,7 @@ on:
     paths:
       - 'api-check-cpf/**'
     tags:
-      - 'v*.*.*'
+      - 'cpf-v*.*.*'
 
 permissions:
   contents: read
@@ -57,7 +57,7 @@ jobs:
           flavor: |
             latest=false
           tags: |
-            type=match,pattern=eptm-v(.*),group=1
+            type=match,pattern=cpf-v(.*),group=1
             type=sha,prefix=sha-
             type=raw,value=${{ env.ENV_TAG }}
 
