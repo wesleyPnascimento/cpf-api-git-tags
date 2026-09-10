@@ -57,8 +57,8 @@ jobs:
       - name: Build e Push da imagem
         uses: docker/build-push-action@v6
         with:
-          context: ./check_digitos_cpf
-          file: ./check_digitos_cpf/Dockerfile
+          context: ./api-check-cpf
+          file: ./api-check-cpf/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
