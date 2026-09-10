@@ -1,0 +1,54 @@
+name: Build Check Digitos CPF
+
+on:
+  push:
+    paths:
+      - 'api-check-cpf/**'
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/wesleypnascimento/api-check-cpf
+
+jobs:
+  build:
+    name: Build and Push
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ----------------------------------------
+      # 1. Checkout do código
+      # ----------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ----------------------------------------
+      # 3. Extrai informações da versão
+      # ----------------------------------------
+      - name: Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=sha,prefix=sha-
+            type=raw,value=latest
+
+      # ----------------------------------------
+      # 4. Build + Push
+      # ----------------------------------------
+      - name: Build e Push da imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: ./check_digitos_cpf
+          file: ./check_digitos_cpf/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

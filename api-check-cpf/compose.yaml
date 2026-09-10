@@ -1,0 +1,25 @@
+services:
+  check-cpf:
+    image: ghcr.io/wesleypnascimento/api-check-cpf:${{ github.ref_tag_name }}
+    container_name: ${SERVICE_NAME}
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    expose:
+      - "${PORT}"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${SERVICE_NAME}.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.services.${SERVICE_NAME}.loadbalancer.server.port=${PORT}"
+      - "traefik.http.routers.${SERVICE_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${SERVICE_NAME}.tls.certresolver=letsencrypt"
+
+    networks:
+      - opt-net
+
+networks:
+  opt-net:
+    external: true
