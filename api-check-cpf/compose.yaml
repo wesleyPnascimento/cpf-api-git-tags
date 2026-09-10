@@ -1,6 +1,6 @@
 services:
   check-cpf:
-    image: ghcr.io/wesleypnascimento/api-check-cpf:${{ github.ref_tag_name }}
+    image: ghcr.io/wesleypnascimento/api-check-cpf:v1.0.7
     container_name: ${SERVICE_NAME}
     restart: unless-stopped
 
