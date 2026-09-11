@@ -2,6 +2,8 @@ name: Build Check Digitos CPF
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'api-check-cpf/**'
     tags:
@@ -41,25 +43,14 @@ jobs:
       # ----------------------------------------
       # 3. Extrai informações da versão
       # ----------------------------------------
-      - name: Definir tag do ambiente
-        run: |
-          if [ "${GITHUB_REF_NAME}" = "main" ]; then
-            echo "ENV_TAG=latest" >> $GITHUB_ENV
-          else
-            echo "ENV_TAG=dev" >> $GITHUB_ENV
-          fi
-
       - name: Docker Metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
           tags: |
             type=match,pattern=cpf-v(.*),group=1
             type=sha,prefix=sha-
-            type=raw,value=${{ env.ENV_TAG }}
 
       # ----------------------------------------
       # 4. Build + Push
