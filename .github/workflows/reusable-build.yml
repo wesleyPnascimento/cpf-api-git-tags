@@ -23,11 +23,6 @@ on:
         required: true
         type: string
 
-    secrets:
-      GHCR_TOKEN:
-        description: "Token para autenticação no GHCR"
-        required: true
-
 permissions:
   contents: read
   packages: write
@@ -57,7 +52,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ github.token }}
 
       # ----------------------------------------
       # 3. Extrai informações da versão

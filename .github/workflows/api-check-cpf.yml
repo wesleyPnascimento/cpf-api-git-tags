@@ -7,7 +7,12 @@ on:
     tags:
       - 'cpf-v*.*.*'
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
+
   build:
     name: Build Check Digitos CPF
 
@@ -18,6 +23,3 @@ jobs:
       context: ./api-check-cpf
       dockerfile: ./api-check-cpf/Dockerfile
       tag_prefix: cpf-v
-
-    secrets:
-      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
