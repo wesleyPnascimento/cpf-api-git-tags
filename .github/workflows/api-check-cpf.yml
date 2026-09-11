@@ -1,65 +1,25 @@
+```yaml
 name: Build Check Digitos CPF
 
 on:
   push:
-    branches:
-      - main
     paths:
       - 'api-check-cpf/**'
     tags:
       - 'cpf-v*.*.*'
 
-permissions:
-  contents: read
-  packages: write
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/wesleypnascimento/api-check-cpf
-
 jobs:
+
   build:
-    name: Build and Push
-    runs-on: ubuntu-latest
+    name: Build Check Digitos CPF
 
-    steps:
+    uses: ./.github/workflows/reusable-build.yml
 
-      # ----------------------------------------
-      # 1. Checkout do código
-      # ----------------------------------------
-      - name: Checkout
-        uses: actions/checkout@v4
+    with:
+      image_name: check-digitos-cpf
+      context: ./api-check-cpf
+      dockerfile: ./api-check-cpf/Dockerfile
+      tag_prefix: cpf-v
 
-      # ----------------------------------------
-      # 2. Login no GitHub Container Registry
-      # ----------------------------------------
-      - name: Login no GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # ----------------------------------------
-      # 3. Extrai informações da versão
-      # ----------------------------------------
-      - name: Docker Metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_NAME }}
-          tags: |
-            type=match,pattern=cpf-v(.*),group=1
-            type=sha,prefix=sha-
-
-      # ----------------------------------------
-      # 4. Build + Push
-      # ----------------------------------------
-      - name: Build e Push da imagem
-        uses: docker/build-push-action@v6
-        with:
-          context: ./api-check-cpf
-          file: ./api-check-cpf/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}

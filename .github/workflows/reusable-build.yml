@@ -1,0 +1,85 @@
+```yaml
+name: Reusable Build
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        description: "Nome da imagem no GHCR"
+        required: true
+        type: string
+
+      context:
+        description: "Contexto do Docker Build"
+        required: true
+        type: string
+
+      dockerfile:
+        description: "Caminho do Dockerfile"
+        required: true
+        type: string
+
+      tag_prefix:
+        description: "Prefixo da tag do serviço"
+        required: true
+        type: string
+
+    secrets:
+      GHCR_TOKEN:
+        description: "Token para autenticação no GHCR"
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+
+  build:
+    name: Build and Push
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ----------------------------------------
+      # 1. Checkout do código
+      # ----------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ----------------------------------------
+      # 2. Login no GitHub Container Registry
+      # ----------------------------------------
+      - name: Login no GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      # ----------------------------------------
+      # 3. Extrai informações da versão
+      # ----------------------------------------
+      - name: Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ inputs.image_name }}
+          tags: |
+            type=match,pattern=${{ inputs.tag_prefix }}(.*),group=1
+            type=sha,prefix=sha-
+
+      # ----------------------------------------
+      # 4. Build + Push
+      # ----------------------------------------
+      - name: Build e Push da imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
