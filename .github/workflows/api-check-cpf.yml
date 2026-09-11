@@ -8,14 +8,13 @@ on:
       - 'cpf-v*.*.*'
 
 jobs:
-
   build:
     name: Build Check Digitos CPF
 
     uses: ./.github/workflows/reusable-build.yml
 
     with:
-      image_name: check-digitos-cpf
+      image_name: api-check-cpf
       context: ./api-check-cpf
       dockerfile: ./api-check-cpf/Dockerfile
       tag_prefix: cpf-v
