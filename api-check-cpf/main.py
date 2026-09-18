@@ -16,7 +16,7 @@ def validar_cpf(cpf):
     primeiro_digito = (soma * 10) % 11
     if primeiro_digito == 10:
         primeiro_digito = 0
-
+    # Verifica se o primeiro dígito verificador está correto
     if primeiro_digito != int(cpf[9]):
         return False
 
