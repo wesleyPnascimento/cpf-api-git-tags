@@ -12,7 +12,7 @@ permissions:
 jobs:
   build:
     name: Build Saude Via Net
-    uses: ./.github/workflows/reusable-build.yml
+    uses: ./.github/workflows/reusable-build-remote.yml
     with:
       image_name: saude-via-net
       repository: kaiofeitosa/saude_via_net_integration
