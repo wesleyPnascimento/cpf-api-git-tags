@@ -19,7 +19,7 @@ on:
 
     secrets:
       checkout_token:                   # NOVO: PAT p/ clonar repo privado (opcional)
-        required: false
+        required: true
 
 permissions:
   contents: read
