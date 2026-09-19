@@ -1,0 +1,66 @@
+name: Reusable Build
+
+on:
+  workflow_call:
+    inputs:
+      image_name:   { required: true, type: string }
+      context:      { required: true, type: string }
+      dockerfile:   { required: true, type: string }
+      tag_prefix:   { required: true, type: string }
+
+      repository:                       # NOVO: repo externo (owner/repo). Vazio = repo atual
+        required: false
+        type: string
+        default: ''
+      source_ref:                       # NOVO: branch/tag/sha do repo dele. Vazio = branch padrão
+        required: false
+        type: string
+        default: ''
+
+    secrets:
+      checkout_token:                   # NOVO: PAT p/ clonar repo privado (opcional)
+        required: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    name: Build and Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repository != '' && inputs.repository || github.repository }}
+          ref: ${{ inputs.source_ref }}
+          token: ${{ secrets.checkout_token || github.token }}
+
+      - name: Login no GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ inputs.image_name }}
+          tags: |
+            type=match,pattern=${{ inputs.tag_prefix }}(.*),group=1
+            type=sha,prefix=sha-
+
+      - name: Build e Push da imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
